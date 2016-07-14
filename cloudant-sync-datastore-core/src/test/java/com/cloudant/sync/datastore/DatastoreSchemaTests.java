@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
@@ -188,9 +189,11 @@ public class DatastoreSchemaTests {
         Assert.assertTrue(unzipToDirectory(zippedVersion6, temp_folder));
 
         // Datastore manager the temp folder
-        DatastoreImpl datastore = (DatastoreImpl) DatastoreManager.getInstance(
+        Datastore proxy = DatastoreManager.getInstance(
                 new File(temp_folder, "datastores").getAbsolutePath())
                 .openDatastore("testdb");
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        DatastoreImpl datastore = datastoreFasçde.getDatastoreImplementation();
 
         // Check migration worked
         datastore.runOnDbQueue(new SQLQueueCallable<Object>() {

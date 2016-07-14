@@ -32,6 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -332,8 +333,12 @@ public class DatastoreManager {
             // dbDirectory will created in BasicDatastore constructor
             // if it does not exist
 
+
+
+
             //Pass database directory, database name, and SQLCipher key provider
-            DatastoreImpl ds = new DatastoreImpl(dbDirectory, dbName, provider);
+            Datastore ds = (Datastore) Proxy.newProxyInstance(Datastore.class.getClassLoader(),
+                    new Class<?>[]{Datastore.class}, new DatastoreFaçade(dbDirectory, dbName, provider));
 
             if(!dbDirectoryExist) {
                 this.eventBus.post(new DatabaseCreated(dbName));

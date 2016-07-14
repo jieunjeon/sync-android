@@ -19,6 +19,8 @@ import com.cloudant.http.HttpConnectionRequestInterceptor;
 import com.cloudant.http.interceptors.CookieInterceptor;
 import com.cloudant.mazha.CouchClient;
 import com.cloudant.mazha.CouchConfig;
+import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DatastoreManager;
 import com.cloudant.sync.sqlite.SQLDatabase;
@@ -29,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 public abstract class ReplicationTestBase extends CouchTestBase {
@@ -64,7 +67,9 @@ public abstract class ReplicationTestBase extends CouchTestBase {
     protected void createDatastore() throws Exception {
         datastoreManagerPath = TestUtils.createTempTestingDir(this.getClass().getName());
         datastoreManager = DatastoreManager.getInstance(this.datastoreManagerPath);
-        datastore = (DatastoreImpl) datastoreManager.openDatastore(getClass().getSimpleName());
+        Datastore proxy = this.datastoreManager.openDatastore(getClass().getSimpleName());
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        this.datastore = datastoreFasçde.getDatastoreImplementation();
         datastoreWrapper = new DatastoreWrapper(datastore);
     }
 

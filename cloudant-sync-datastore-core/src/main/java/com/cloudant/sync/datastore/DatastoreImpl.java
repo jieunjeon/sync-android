@@ -2172,7 +2172,7 @@ public class DatastoreImpl implements Datastore {
         return null;
     }
 
-    <T> Future<T> runOnDbQueue(SQLQueueCallable<T> callable){
+    public <T> Future<T> runOnDbQueue(SQLQueueCallable<T> callable){
         return queue.submit(callable);
     }
 }

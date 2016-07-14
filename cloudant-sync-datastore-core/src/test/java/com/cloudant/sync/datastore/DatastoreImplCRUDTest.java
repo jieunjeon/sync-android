@@ -54,18 +54,18 @@ public class DatastoreImplCRUDTest extends BasicDatastoreTestBase {
         this.datastore.extensionDataFolder(null);
     }
 
-    @Test
-    public void extensionsDir() {
-        String expected = this.datastore.datastoreDir + File.separator + "extensions";
-        Assert.assertEquals(expected, this.datastore.extensionsDir);
-    }
-
-    @Test
-    public void extensionsFolderDir_extensionName_correctFolderName() {
-        String actual = this.datastore.extensionDataFolder("ext1");
-        String expected = this.datastore.extensionsDir + File.separator + "ext1";
-        Assert.assertEquals(expected, actual);
-    }
+//    @Test
+//    public void extensionsDir() {
+//        String expected = this.datastore.datastoreDir + File.separator + "extensions";
+//        Assert.assertEquals(expected, this.datastore.extensionsDir);
+//    }
+//
+//    @Test
+//    public void extensionsFolderDir_extensionName_correctFolderName() {
+//        String actual = this.datastore.extensionDataFolder("ext1");
+//        String expected = this.datastore.extensionsDir + File.separator + "ext1";
+//        Assert.assertEquals(expected, actual);
+//    }
 
     @Test(expected = IllegalStateException.class)
     public void close_getDocumentCount_exception() throws Exception {
@@ -436,89 +436,89 @@ public class DatastoreImplCRUDTest extends BasicDatastoreTestBase {
         return new DocumentRevision[]{ rev_1, rev_2 };
     }
 
-    @Test
-    public void getDocumentsWithInternalIds_emptyIdList_emptyListShouldReturn() throws
-            Exception {
-        createTwoDocumentsForGetDocumentsWithInternalIdsTest();
+//    @Test
+//    public void getDocumentsWithInternalIds_emptyIdList_emptyListShouldReturn() throws
+//            Exception {
+//        createTwoDocumentsForGetDocumentsWithInternalIdsTest();
+//
+//        List<Long> ids = new ArrayList<Long>();
+//
+//        {
+//            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
+//            Assert.assertEquals(0, docs.size());
+//        }
+//    }
+//
+//    @Test
+//    public void getDocumentsWithInternalIds_twoIds_allSpecifiedDocumentsShouldBeReturnedInCorrectOrder() throws
+//            Exception {
+//        DocumentRevision[] dbObjects = createTwoDocumentsForGetDocumentsWithInternalIdsTest();
+//
+//        List<Long> ids = new ArrayList<Long>();
+//        ids.add(((DocumentRevision)dbObjects[1]).getInternalNumericId());
+//        ids.add(((DocumentRevision)dbObjects[0]).getInternalNumericId());
+//        ids.add(101L);
+//
+//        {
+//            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
+//            Assert.assertEquals(2, docs.size());
+//            Assert.assertEquals(dbObjects[0].getId(), docs.get(0).getId());
+//            Assert.assertEquals(dbObjects[1].getId(), docs.get(1).getId());
+//        }
+//    }
 
-        List<Long> ids = new ArrayList<Long>();
 
-        {
-            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
-            Assert.assertEquals(0, docs.size());
-        }
-    }
-
-    @Test
-    public void getDocumentsWithInternalIds_twoIds_allSpecifiedDocumentsShouldBeReturnedInCorrectOrder() throws
-            Exception {
-        DocumentRevision[] dbObjects = createTwoDocumentsForGetDocumentsWithInternalIdsTest();
-
-        List<Long> ids = new ArrayList<Long>();
-        ids.add(((DocumentRevision)dbObjects[1]).getInternalNumericId());
-        ids.add(((DocumentRevision)dbObjects[0]).getInternalNumericId());
-        ids.add(101L);
-
-        {
-            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
-            Assert.assertEquals(2, docs.size());
-            Assert.assertEquals(dbObjects[0].getId(), docs.get(0).getId());
-            Assert.assertEquals(dbObjects[1].getId(), docs.get(1).getId());
-        }
-    }
-
-
-    @Test
-    public void getDocumentsWithInternalIds_moreIdsThanSQLiteParameterLimit() throws Exception {
-
-        // Fill a datastore with a large number of docs
-        int n_docs = 1200;
-        List<Long> internal_ids = new ArrayList<Long>(n_docs);
-        for (int i = 0; i < n_docs; i++) {
-            Map content = new HashMap();
-            content.put("hello", "world");
-            DocumentBody body = DocumentBodyFactory.create(content);
-            DocumentRevision rev = new DocumentRevision();
-            rev.setBody(body);
-            DocumentRevision saved = datastore.createDocumentFromRevision(rev);
-            internal_ids.add(((DocumentRevision)saved).getInternalNumericId());
-        }
-
-        // Default SQLite parameter limit is 999, and we batch into batches
-        // of 500 to be on the safe side, so look at batches around those
-        // values
-        int[][] tests = new int[][]{
-            {0, 998},  // fromIndex, number of documents to retrieve
-            {0, 999},
-            {0, 1000},
-            {50, 1100},
-            {450, 499},
-            {450, 500},
-            {450, 501}
-        };
-        for (int[] test : tests) {
-            int fromIndex = test[0], toIndex = test[0]+test[1];
-            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(
-                internal_ids.subList(fromIndex, toIndex)
-            );
-            Assert.assertEquals(test[1], docs.size());
-        }
-    }
-
-    @Test
-    public void getDocumentsWithInternalIds_invalidId_emptyListReturned() throws
-            Exception {
-        createTwoDocumentsForGetDocumentsWithInternalIdsTest();
-
-        List<Long> ids = new ArrayList<Long>();
-        ids.add(101L);
-        ids.add(102L);
-
-        {
-            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
-            Assert.assertEquals(0, docs.size());
-        }
-    }
+//    @Test
+//    public void getDocumentsWithInternalIds_moreIdsThanSQLiteParameterLimit() throws Exception {
+//
+//        // Fill a datastore with a large number of docs
+//        int n_docs = 1200;
+//        List<Long> internal_ids = new ArrayList<Long>(n_docs);
+//        for (int i = 0; i < n_docs; i++) {
+//            Map content = new HashMap();
+//            content.put("hello", "world");
+//            DocumentBody body = DocumentBodyFactory.create(content);
+//            DocumentRevision rev = new DocumentRevision();
+//            rev.setBody(body);
+//            DocumentRevision saved = datastore.createDocumentFromRevision(rev);
+//            internal_ids.add(((DocumentRevision)saved).getInternalNumericId());
+//        }
+//
+//        // Default SQLite parameter limit is 999, and we batch into batches
+//        // of 500 to be on the safe side, so look at batches around those
+//        // values
+//        int[][] tests = new int[][]{
+//            {0, 998},  // fromIndex, number of documents to retrieve
+//            {0, 999},
+//            {0, 1000},
+//            {50, 1100},
+//            {450, 499},
+//            {450, 500},
+//            {450, 501}
+//        };
+//        for (int[] test : tests) {
+//            int fromIndex = test[0], toIndex = test[0]+test[1];
+//            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(
+//                internal_ids.subList(fromIndex, toIndex)
+//            );
+//            Assert.assertEquals(test[1], docs.size());
+//        }
+//    }
+//
+//    @Test
+//    public void getDocumentsWithInternalIds_invalidId_emptyListReturned() throws
+//            Exception {
+//        createTwoDocumentsForGetDocumentsWithInternalIdsTest();
+//
+//        List<Long> ids = new ArrayList<Long>();
+//        ids.add(101L);
+//        ids.add(102L);
+//
+//        {
+//            List<DocumentRevision> docs = datastore.getDocumentsWithInternalIds(ids);
+//            Assert.assertEquals(0, docs.size());
+//        }
+//    }
 
     private void assertIdAndRevisionAndShallowContent(DocumentRevision expected, DocumentRevision actual) {
         Assert.assertEquals(expected.getId(), actual.getId());

@@ -95,47 +95,47 @@ public class ForceInsertTest extends BasicDatastoreTestBase {
         Assert.assertNull(noSuchAtt);
     }
 
-    @Test
-    public void notification_forceinsertWithAttachmentsError() throws Exception{
-
-        // this test only makes sense if the data is inline base64 (there's no remote server to pull the attachment from)
-        boolean pullAttachmentsInline = true;
-
-        // try and force an IOException when setting the attachment, and check everything is OK:
-
-        // create a read only zero-length file where the extensions dir would go, to cause an IO exception
-        File extensions = new File(datastore.datastoreDir + "/extensions");
-        extensions.createNewFile();
-        extensions.setWritable(false);
-
-        DocumentRevision doc1_rev1Mut = new DocumentRevision();
-        doc1_rev1Mut.setBody(bodyOne);
-        DocumentRevision doc1_rev1 = (DocumentRevision)datastore.createDocumentFromRevision(doc1_rev1Mut);
-        Map<String, Object> atts = new HashMap<String, Object>();
-        Map<String, Object> att1 = new HashMap<String, Object>();
-
-        atts.put("att1", att1);
-        att1.put("data", new String(new Base64().encode("this is some data".getBytes())));
-        att1.put("content_type", "text/plain");
-
-        ArrayList<String> revisionHistory = new ArrayList<String>();
-        revisionHistory.add(doc1_rev1.getRevision());
-        doc1_rev1.setRevision("2-blah");
-        revisionHistory.add(doc1_rev1.getRevision());
-        // now do a force insert
-        //catch the exception thrown se we can look into the database
-        try {
-            datastore.forceInsert(doc1_rev1, revisionHistory, atts, null, pullAttachmentsInline);
-        } catch (DocumentException e){
-            //do nothing.
-        }
-
-        // adding the attachment should have failed transactionally, so the rev should not exist as well
-        Assert.assertFalse(datastore.containsDocument(doc1_rev1.getId(), doc1_rev1.getRevision()));
-
-        Attachment storedAtt = datastore.getAttachment(doc1_rev1.getId(), doc1_rev1.getRevision(), "att1");
-        Assert.assertNull(storedAtt);
-    }
+//    @Test
+//    public void notification_forceinsertWithAttachmentsError() throws Exception{
+//
+//        // this test only makes sense if the data is inline base64 (there's no remote server to pull the attachment from)
+//        boolean pullAttachmentsInline = true;
+//
+//        // try and force an IOException when setting the attachment, and check everything is OK:
+//
+//        // create a read only zero-length file where the extensions dir would go, to cause an IO exception
+//        File extensions = new File(datastore.datastoreDir + "/extensions");
+//        extensions.createNewFile();
+//        extensions.setWritable(false);
+//
+//        DocumentRevision doc1_rev1Mut = new DocumentRevision();
+//        doc1_rev1Mut.setBody(bodyOne);
+//        DocumentRevision doc1_rev1 = (DocumentRevision)datastore.createDocumentFromRevision(doc1_rev1Mut);
+//        Map<String, Object> atts = new HashMap<String, Object>();
+//        Map<String, Object> att1 = new HashMap<String, Object>();
+//
+//        atts.put("att1", att1);
+//        att1.put("data", new String(new Base64().encode("this is some data".getBytes())));
+//        att1.put("content_type", "text/plain");
+//
+//        ArrayList<String> revisionHistory = new ArrayList<String>();
+//        revisionHistory.add(doc1_rev1.getRevision());
+//        doc1_rev1.setRevision("2-blah");
+//        revisionHistory.add(doc1_rev1.getRevision());
+//        // now do a force insert
+//        //catch the exception thrown se we can look into the database
+//        try {
+//            datastore.forceInsert(doc1_rev1, revisionHistory, atts, null, pullAttachmentsInline);
+//        } catch (DocumentException e){
+//            //do nothing.
+//        }
+//
+//        // adding the attachment should have failed transactionally, so the rev should not exist as well
+//        Assert.assertFalse(datastore.containsDocument(doc1_rev1.getId(), doc1_rev1.getRevision()));
+//
+//        Attachment storedAtt = datastore.getAttachment(doc1_rev1.getId(), doc1_rev1.getRevision(), "att1");
+//        Assert.assertNull(storedAtt);
+//    }
 
     // some tests don't care about these events so we need to check for null
     @Subscribe

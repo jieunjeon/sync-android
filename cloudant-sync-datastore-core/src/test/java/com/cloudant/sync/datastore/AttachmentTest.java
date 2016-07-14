@@ -130,85 +130,85 @@ public class AttachmentTest extends BasicDatastoreTestBase {
         datastore.updateDocumentFromRevision(newRevision);
     }
 
-    @Test
-    public void createDeleteAttachmentsTest() throws Exception{
-
-        DocumentRevision rev_1Mut = new DocumentRevision();
-        rev_1Mut.setBody(bodyOne);
-        DocumentRevision rev_1 = datastore.createDocumentFromRevision(rev_1Mut);
-        Attachment att1 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/attachment_1.txt"), "text/plain");
-        Attachment att2 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/attachment_2.txt"), "text/plain");
-        Attachment att3 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/bonsai-boston.jpg"), "image/jpeg");
-        DocumentRevision rev2 = null;
-
-        DocumentRevision rev_1_mut = rev_1;
-        rev_1_mut.getAttachments().put(att1.name, att1);
-        rev_1_mut.getAttachments().put(att2.name, att2);
-        rev_1_mut.getAttachments().put(att3.name, att3);
-        rev2 = datastore.updateDocumentFromRevision(rev_1_mut);
-        Assert.assertNotNull("Revision null", rev2);
-
-        DocumentRevision rev3 = null;
-
-        DocumentRevision rev2_mut = rev2;
-        rev2_mut.getAttachments().remove(att1.name);
-        rev3 = datastore.updateDocumentFromRevision(rev2_mut);
-        datastore.compact();
-        Assert.assertNotNull("Revision null", rev3);
-
-        // 1st shouldn't exist
-        Attachment savedAtt1 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "attachment_1.txt");
-        Assert.assertNull("Att1 not null", savedAtt1);
-
-        // check we can read from the 2nd attachment, it wasn't deleted
-        Attachment savedAtt2 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "attachment_2.txt");
-        Assert.assertNotNull("Att2 null", savedAtt2);
-        int i2 = savedAtt2.getInputStream().read();
-        Assert.assertTrue("Can't read from Att2", i2 >= 0);
-
-        // check we can read from the 3rd attachment, it wasn't deleted
-        Attachment savedAtt3 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "bonsai-boston.jpg");
-        Assert.assertNotNull("Att3 null", savedAtt3);
-        int i3 = savedAtt3.getInputStream().read();
-        Assert.assertTrue("Can't read from Att2", i3 >= 0);
-
-        // now sneakily look for them on disk
-        File attachments = new File(datastore.datastoreDir + "/extensions/com.cloudant.attachments");
-        int count = attachments.listFiles().length;
-        Assert.assertEquals("Did not find 1 file in blob store", 2, count);
-    }
-
-
-    @Test
-    public void createDeleteAttachmentsFailTest() throws Exception {
-        // check that an attachment 'going missing' from the blob store doesn't stop us deleting it
-        // from the database
-        String attachmentName = "attachment_1.txt";
-        DocumentRevision rev_1Mut = new DocumentRevision();
-        rev_1Mut.setBody(bodyOne);
-        DocumentRevision rev_1 = datastore.createDocumentFromRevision(rev_1Mut);
-        File f = TestUtils.loadFixture("fixture/"+attachmentName);
-        Attachment att = new UnsavedFileAttachment(f, "text/plain");
-        DocumentRevision rev2 = null;
-        DocumentRevision rev_1_mut = rev_1;
-        rev_1_mut.getAttachments().put(att.name, att);
-        rev2 = datastore.updateDocumentFromRevision(rev_1_mut);
-        Assert.assertNotNull("Revision null", rev2);
-
-        DocumentRevision rev3 = null;
-        // clear out the attachment directory
-        File attachments = new File(datastore.datastoreDir + "/extensions/com.cloudant.attachments");
-        for(File attFile : attachments.listFiles()) {
-            attFile.delete();
-        }
-        DocumentRevision rev2_mut = rev2;
-        rev2_mut.getAttachments().remove(attachmentName);
-        rev3 = datastore.updateDocumentFromRevision(rev2_mut);
-        Assert.assertNotNull("Revision null", rev3);
-
-        // check that there are no attachments now associated with this doc
-        Assert.assertTrue("Revision should have 0 attachments", datastore.attachmentsForRevision((DocumentRevision)rev3).isEmpty());
-    }
+//    @Test
+//    public void createDeleteAttachmentsTest() throws Exception{
+//
+//        DocumentRevision rev_1Mut = new DocumentRevision();
+//        rev_1Mut.setBody(bodyOne);
+//        DocumentRevision rev_1 = datastore.createDocumentFromRevision(rev_1Mut);
+//        Attachment att1 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/attachment_1.txt"), "text/plain");
+//        Attachment att2 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/attachment_2.txt"), "text/plain");
+//        Attachment att3 = new UnsavedFileAttachment(TestUtils.loadFixture("fixture/bonsai-boston.jpg"), "image/jpeg");
+//        DocumentRevision rev2 = null;
+//
+//        DocumentRevision rev_1_mut = rev_1;
+//        rev_1_mut.getAttachments().put(att1.name, att1);
+//        rev_1_mut.getAttachments().put(att2.name, att2);
+//        rev_1_mut.getAttachments().put(att3.name, att3);
+//        rev2 = datastore.updateDocumentFromRevision(rev_1_mut);
+//        Assert.assertNotNull("Revision null", rev2);
+//
+//        DocumentRevision rev3 = null;
+//
+//        DocumentRevision rev2_mut = rev2;
+//        rev2_mut.getAttachments().remove(att1.name);
+//        rev3 = datastore.updateDocumentFromRevision(rev2_mut);
+//        datastore.compact();
+//        Assert.assertNotNull("Revision null", rev3);
+//
+//        // 1st shouldn't exist
+//        Attachment savedAtt1 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "attachment_1.txt");
+//        Assert.assertNull("Att1 not null", savedAtt1);
+//
+//        // check we can read from the 2nd attachment, it wasn't deleted
+//        Attachment savedAtt2 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "attachment_2.txt");
+//        Assert.assertNotNull("Att2 null", savedAtt2);
+//        int i2 = savedAtt2.getInputStream().read();
+//        Assert.assertTrue("Can't read from Att2", i2 >= 0);
+//
+//        // check we can read from the 3rd attachment, it wasn't deleted
+//        Attachment savedAtt3 = datastore.getAttachment(rev3.getId(), rev3.getRevision(), "bonsai-boston.jpg");
+//        Assert.assertNotNull("Att3 null", savedAtt3);
+//        int i3 = savedAtt3.getInputStream().read();
+//        Assert.assertTrue("Can't read from Att2", i3 >= 0);
+//
+//        // now sneakily look for them on disk
+//        File attachments = new File(datastore.datastoreDir + "/extensions/com.cloudant.attachments");
+//        int count = attachments.listFiles().length;
+//        Assert.assertEquals("Did not find 1 file in blob store", 2, count);
+//    }
+//
+//
+//    @Test
+//    public void createDeleteAttachmentsFailTest() throws Exception {
+//        // check that an attachment 'going missing' from the blob store doesn't stop us deleting it
+//        // from the database
+//        String attachmentName = "attachment_1.txt";
+//        DocumentRevision rev_1Mut = new DocumentRevision();
+//        rev_1Mut.setBody(bodyOne);
+//        DocumentRevision rev_1 = datastore.createDocumentFromRevision(rev_1Mut);
+//        File f = TestUtils.loadFixture("fixture/"+attachmentName);
+//        Attachment att = new UnsavedFileAttachment(f, "text/plain");
+//        DocumentRevision rev2 = null;
+//        DocumentRevision rev_1_mut = rev_1;
+//        rev_1_mut.getAttachments().put(att.name, att);
+//        rev2 = datastore.updateDocumentFromRevision(rev_1_mut);
+//        Assert.assertNotNull("Revision null", rev2);
+//
+//        DocumentRevision rev3 = null;
+//        // clear out the attachment directory
+//        File attachments = new File(datastore.datastoreDir + "/extensions/com.cloudant.attachments");
+//        for(File attFile : attachments.listFiles()) {
+//            attFile.delete();
+//        }
+//        DocumentRevision rev2_mut = rev2;
+//        rev2_mut.getAttachments().remove(attachmentName);
+//        rev3 = datastore.updateDocumentFromRevision(rev2_mut);
+//        Assert.assertNotNull("Revision null", rev3);
+//
+//        // check that there are no attachments now associated with this doc
+//        Assert.assertTrue("Revision should have 0 attachments", datastore.attachmentsForRevision((DocumentRevision)rev3).isEmpty());
+//    }
 
 
     @Test

@@ -19,6 +19,8 @@ import com.cloudant.sync.util.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 
+import java.lang.reflect.Proxy;
+
 /**
  * Test base for any test suite need a <code>DatastoreManager</code> and <code>Datastore</code> instance. It
  * automatically set up and clean up the temp file directly for you.
@@ -33,7 +35,10 @@ public abstract class DatastoreTestBase {
     public void setUp() throws Exception {
         datastore_manager_dir = TestUtils.createTempTestingDir(this.getClass().getName());
         datastoreManager = DatastoreManager.getInstance(this.datastore_manager_dir);
-        this.datastore = (DatastoreImpl) (this.datastoreManager.openDatastore(getClass().getSimpleName()));
+
+        Datastore proxy = this.datastoreManager.openDatastore(getClass().getSimpleName());
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        this.datastore = datastoreFasçde.getDatastoreImplementation();
 
     }
 

@@ -17,6 +17,8 @@ package com.cloudant.sync.replication;
 import com.cloudant.common.RequireRunningCouchDB;
 import com.cloudant.mazha.Response;
 import com.cloudant.sync.datastore.ConflictResolver;
+import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentBodyFactory;
 import com.cloudant.sync.datastore.DocumentRevision;
@@ -28,6 +30,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +71,9 @@ public class AttachmentsConflictsTest extends ReplicationTestBase {
         this.push();
 
         this.datastoreManager.deleteDatastore(this.datastore.getDatastoreName());
-        this.datastore = (DatastoreImpl)this.datastoreManager.openDatastore("foo-bar-baz");
+        Datastore proxy = this.datastoreManager.openDatastore("foo-bar-baz");
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        this.datastore = datastoreFasçde.getDatastoreImplementation();
         this.pull();
 
         DocumentRevision gotRev = this.datastore.getDocument("doc-a");
@@ -118,7 +123,9 @@ public class AttachmentsConflictsTest extends ReplicationTestBase {
         this.pull();
 
         this.datastoreManager.deleteDatastore(this.datastore.getDatastoreName());
-        this.datastore = (DatastoreImpl)this.datastoreManager.openDatastore("foo-bar-baz");
+        Datastore proxy = this.datastoreManager.openDatastore("foo-bar-baz");
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        this.datastore = datastoreFasçde.getDatastoreImplementation();
         this.pull();
 
         DocumentRevision gotRev = this.datastore.getDocument("doc-a");

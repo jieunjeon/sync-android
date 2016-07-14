@@ -16,6 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DatastoreManager;
 import com.cloudant.sync.sqlite.SQLDatabase;
@@ -24,6 +26,8 @@ import com.cloudant.sync.util.TestUtils;
 
 import org.junit.After;
 import org.junit.Before;
+
+import java.lang.reflect.Proxy;
 
 public abstract class AbstractIndexTestBase {
 
@@ -39,7 +43,11 @@ public abstract class AbstractIndexTestBase {
         assertThat(factoryPath, is(notNullValue()));
         factory = DatastoreManager.getInstance(factoryPath);
         assertThat(factory, is(notNullValue()));
-        ds = (DatastoreImpl) factory.openDatastore(AbstractIndexTestBase.class.getSimpleName());
+
+        Datastore proxy = this.factory.openDatastore(getClass().getSimpleName());
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
+        this.ds = datastoreFasçde.getDatastoreImplementation();
+
         assertThat(ds, is(notNullValue()));
         im = new IndexManager(ds);
         assertThat(im, is(notNullValue()));
