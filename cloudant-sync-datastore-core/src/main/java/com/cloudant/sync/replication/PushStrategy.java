@@ -23,6 +23,7 @@ import com.cloudant.sync.datastore.AttachmentException;
 import com.cloudant.sync.datastore.Changes;
 import com.cloudant.sync.datastore.Datastore;
 import com.cloudant.sync.datastore.DatastoreException;
+import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentRevision;
 import com.cloudant.sync.datastore.DocumentRevisionTree;
@@ -37,6 +38,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -100,7 +102,8 @@ class PushStrategy implements ReplicationStrategy {
                         URI target,
                         List<HttpConnectionRequestInterceptor> requestInterceptors,
                         List<HttpConnectionResponseInterceptor> responseInterceptors) {
-        this.sourceDb = new DatastoreWrapper((DatastoreImpl) source);
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(source);
+        this.sourceDb = new DatastoreWrapper(datastoreFasçde.getDatastoreImplementation());
         this.targetDb = new CouchClientWrapper(new CouchClient(target, requestInterceptors, responseInterceptors));
         String replicatorName = String.format("%s <-- %s ", target, source.getDatastoreName());
         this.name = String.format("%s [%s]", LOG_TAG, replicatorName);

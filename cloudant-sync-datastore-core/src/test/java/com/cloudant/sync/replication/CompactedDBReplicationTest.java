@@ -93,7 +93,7 @@ public class CompactedDBReplicationTest extends ReplicationTestBase {
 
         List<String> remoteRevs = ClientTestUtils.getRemoteRevisionIDs(getURI);
         List<String> localRevs = new ArrayList<String>();
-        DocumentRevisionTree localRevsTree = datastore.getAllRevisionsOfDocument(bar.getId());
+        DocumentRevisionTree localRevsTree = datastoreImpl.getAllRevisionsOfDocument(bar.getId());
 
         Map<Long, DocumentRevisionTree.DocumentRevisionNode> roots = localRevsTree.roots();
         Set<Long> rootSet = roots.keySet();

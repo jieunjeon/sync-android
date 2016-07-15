@@ -28,22 +28,22 @@ public class DatastoreFaçade implements InvocationHandler {
 
 
     private final DatastoreImpl datastore;
-    private final IndexManager indexManager;
+    private final Query query;
     private final Class<? extends DatastoreImpl> datastoreClazz;
-    private final Class<? extends IndexManager> indexManagerClazz;
+    private final Class<? extends Query> queryClazz;
 
     public DatastoreFaçade(String dir, String name, KeyProvider keyProvider) throws DatastoreException, SQLException, IOException {
         datastore = new DatastoreImpl(dir, name, keyProvider);
         datastoreClazz = datastore.getClass();
-        indexManager = new IndexManager(datastore);
-        indexManagerClazz = indexManager.getClass();
+        query = new Query(datastore);
+        queryClazz = query.getClass();
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         if (method.getName().equals("close")){
-            indexManager.close();
+            query.close();
             datastore.close();
             return null;
         }
@@ -52,12 +52,14 @@ public class DatastoreFaçade implements InvocationHandler {
             Method targetMethod = datastoreClazz.getMethod(method.getName(), method.getParameterTypes());
             return targetMethod.invoke(datastore, args);
         } catch (NoSuchMethodException e){
-            Method targetMethod = indexManagerClazz.getMethod(method.getName(), method.getParameterTypes());
-            return targetMethod.invoke(indexManager, args);
+            Method targetMethod = queryClazz.getMethod(method.getName(), method.getParameterTypes());
+            return targetMethod.invoke(query, args);
         }
     }
 
     public DatastoreImpl getDatastoreImplementation(){
         return datastore;
     }
+
+    public Query getQueryImplementation(){ return query;}
 }

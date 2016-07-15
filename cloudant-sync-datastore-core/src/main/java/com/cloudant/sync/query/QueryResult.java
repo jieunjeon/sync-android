@@ -14,6 +14,7 @@ package com.cloudant.sync.query;
 
 import com.cloudant.sync.datastore.Attachment;
 import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentBodyFactory;
 import com.cloudant.sync.datastore.DocumentException;
 import com.cloudant.sync.datastore.DocumentRevision;
@@ -38,14 +39,14 @@ public class QueryResult implements Iterable<DocumentRevision> {
     private final static int DEFAULT_BATCH_SIZE = 50;
 
     private final List<String> originalDocIds;
-    private final Datastore datastore;
+    private final DatastoreImpl datastore;
     private final List<String> fields;
     private final long skip;
     private final long limit;
     private final UnindexedMatcher matcher;
 
     public QueryResult(List<String> originalDocIds,
-                       Datastore datastore,
+                       DatastoreImpl datastore,
                        List<String> fields,
                        long skip,
                        long limit,
@@ -189,7 +190,7 @@ public class QueryResult implements Iterable<DocumentRevision> {
 
     private DocumentRevision projectFields(List<String> fields,
                                            DocumentRevision rev,
-                                           Datastore datastore) {
+                                           DatastoreImpl datastore) {
         // grab the map filter fields and rebuild object
         Map<String, Object> originalBody = rev.getBody().asMap();
         Map<String, Object> body = new HashMap<String, Object>();

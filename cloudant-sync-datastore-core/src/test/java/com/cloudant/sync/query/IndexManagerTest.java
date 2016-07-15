@@ -31,80 +31,80 @@ public class IndexManagerTest extends AbstractIndexTestBase {
 
     @Test
     public void enusureIndexedGeneratesIndexName() {
-        assertThat(im.ensureIndexed(Arrays.<Object>asList("name")), is(notNullValue()));
+        assertThat(ds.ensureIndexed(Arrays.<Object>asList("name")), is(notNullValue()));
     }
 
     @Test
     public void deleteFailOnNoIndexName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
 
-        assertThat(im.deleteIndexNamed(null), is(false));
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        assertThat(ds.deleteIndexNamed(null), is(false));
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
 
-        assertThat(im.deleteIndexNamed(""), is(false));
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        assertThat(ds.deleteIndexNamed(""), is(false));
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
     }
 
     @Test
     public void deleteFailOnInvalidIndexName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
 
-        assertThat(im.deleteIndexNamed("invalid"), is(false));
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        assertThat(ds.deleteIndexNamed("invalid"), is(false));
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
     }
 
     @Test
     public void createIndexWithSpaceInName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic index");
-        assertThat(im.listIndexes().keySet(), contains("basic index"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic index");
+        assertThat(ds.listIndexes().keySet(), contains("basic index"));
     }
 
     @Test
          public void createIndexWithSingleQuoteInName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic'index");
-        assertThat(im.listIndexes().keySet(), contains("basic'index"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic'index");
+        assertThat(ds.listIndexes().keySet(), contains("basic'index"));
     }
 
     @Test
     public void createIndexWithSemiColonQuoteInName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic;index");
-        assertThat(im.listIndexes().keySet(), contains("basic;index"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic;index");
+        assertThat(ds.listIndexes().keySet(), contains("basic;index"));
     }
 
     @Test
     public void createIndexWithBracketsInName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic(index)");
-        assertThat(im.listIndexes().keySet(), contains("basic(index)"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic(index)");
+        assertThat(ds.listIndexes().keySet(), contains("basic(index)"));
     }
 
     @Test
     public void createIndexWithKeyWordName() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "INSERT INDEX");
-        assertThat(im.listIndexes().keySet(), contains("INSERT INDEX"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "INSERT INDEX");
+        assertThat(ds.listIndexes().keySet(), contains("INSERT INDEX"));
     }
 
 
 
     @Test
      public void deleteEmptyIndex() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
 
-        assertThat(im.deleteIndexNamed("basic"), is(true));
-        assertThat(im.listIndexes().isEmpty(), is(true));
+        assertThat(ds.deleteIndexNamed("basic"), is(true));
+        assertThat(ds.listIndexes().isEmpty(), is(true));
     }
 
     @Test
     public void deleteTheCorrectEmptyIndex() {
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        im.ensureIndexed(Arrays.<Object>asList("name", "age"), "basic2");
-        im.ensureIndexed(Arrays.<Object>asList("name"), "basic3");
-        assertThat(im.listIndexes().keySet(), containsInAnyOrder("basic", "basic2", "basic3"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        ds.ensureIndexed(Arrays.<Object>asList("name", "age"), "basic2");
+        ds.ensureIndexed(Arrays.<Object>asList("name"), "basic3");
+        assertThat(ds.listIndexes().keySet(), containsInAnyOrder("basic", "basic2", "basic3"));
 
-        assertThat(im.deleteIndexNamed("basic2"), is(true));
-        assertThat(im.listIndexes().keySet(), containsInAnyOrder("basic", "basic3"));
+        assertThat(ds.deleteIndexNamed("basic2"), is(true));
+        assertThat(ds.listIndexes().keySet(), containsInAnyOrder("basic", "basic3"));
     }
 
     @Test
@@ -122,10 +122,10 @@ public class IndexManagerTest extends AbstractIndexTestBase {
             ds.createDocumentFromRevision(rev);
         }
 
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        assertThat(im.listIndexes().keySet(), contains("basic"));
-        im.deleteIndexNamed("basic");
-        assertThat(im.listIndexes().isEmpty(), is(true));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
+        ds.deleteIndexNamed("basic");
+        assertThat(ds.listIndexes().isEmpty(), is(true));
     }
 
     @Test
@@ -143,13 +143,13 @@ public class IndexManagerTest extends AbstractIndexTestBase {
             ds.createDocumentFromRevision(rev);
         }
 
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
-        im.ensureIndexed(Arrays.<Object>asList("name", "age"), "basic2");
-        im.ensureIndexed(Arrays.<Object>asList("name"), "basic3");
-        assertThat(im.listIndexes().keySet(), containsInAnyOrder("basic", "basic2", "basic3"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic");
+        ds.ensureIndexed(Arrays.<Object>asList("name", "age"), "basic2");
+        ds.ensureIndexed(Arrays.<Object>asList("name"), "basic3");
+        assertThat(ds.listIndexes().keySet(), containsInAnyOrder("basic", "basic2", "basic3"));
 
-        assertThat(im.deleteIndexNamed("basic2"), is(true));
-        assertThat(im.listIndexes().keySet(), containsInAnyOrder("basic", "basic3"));
+        assertThat(ds.deleteIndexNamed("basic2"), is(true));
+        assertThat(ds.listIndexes().keySet(), containsInAnyOrder("basic", "basic3"));
     }
 
     @Test
@@ -167,16 +167,16 @@ public class IndexManagerTest extends AbstractIndexTestBase {
             ds.createDocumentFromRevision(rev);
         }
 
-        im.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic", IndexType.TEXT);
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        ds.ensureIndexed(Arrays.<Object>asList("name", "address"), "basic", IndexType.TEXT);
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
 
-        assertThat(im.deleteIndexNamed("basic"), is(true));
-        assertThat(im.listIndexes().isEmpty(), is(true));
+        assertThat(ds.deleteIndexNamed("basic"), is(true));
+        assertThat(ds.listIndexes().isEmpty(), is(true));
     }
 
     @Test
     public void validateTextSearchIsAvailable() throws Exception {
-        assertThat(im.isTextSearchEnabled(), is(true));
+        assertThat(ds.isTextSearchEnabled(), is(true));
     }
 
 }

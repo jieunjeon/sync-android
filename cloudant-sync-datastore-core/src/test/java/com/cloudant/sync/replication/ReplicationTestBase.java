@@ -39,7 +39,8 @@ public abstract class ReplicationTestBase extends CouchTestBase {
     public String datastoreManagerPath = null;
 
     protected DatastoreManager datastoreManager = null;
-    protected DatastoreImpl datastore = null;
+    protected DatastoreImpl datastoreImpl = null;
+    protected Datastore datastore = null;
     protected SQLDatabase database = null;
     protected DatastoreWrapper datastoreWrapper = null;
 
@@ -67,10 +68,10 @@ public abstract class ReplicationTestBase extends CouchTestBase {
     protected void createDatastore() throws Exception {
         datastoreManagerPath = TestUtils.createTempTestingDir(this.getClass().getName());
         datastoreManager = DatastoreManager.getInstance(this.datastoreManagerPath);
-        Datastore proxy = this.datastoreManager.openDatastore(getClass().getSimpleName());
-        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
-        this.datastore = datastoreFasçde.getDatastoreImplementation();
-        datastoreWrapper = new DatastoreWrapper(datastore);
+        datastore = this.datastoreManager.openDatastore(getClass().getSimpleName());
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(datastore);
+        this.datastoreImpl = datastoreFasçde.getDatastoreImplementation();
+        datastoreWrapper = new DatastoreWrapper(datastoreImpl);
     }
 
     protected void createRemoteDB() {

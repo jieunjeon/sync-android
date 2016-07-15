@@ -14,6 +14,8 @@ package com.cloudant.sync.query;
 
 import com.cloudant.android.ContentValues;
 import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreImpl;
+import com.cloudant.sync.datastore.Query;
 import com.cloudant.sync.sqlite.SQLDatabase;
 import com.google.common.base.Joiner;
 
@@ -38,26 +40,26 @@ import java.util.logging.Logger;
 /**
  *  Handles creating indexes for a given datastore.
  */
-class IndexCreator {
+public class IndexCreator {
 
     private final SQLDatabase database;
-    private final Datastore datastore;
+    private final DatastoreImpl datastore;
     private static Random indexNameRandom = new Random();
 
     private final ExecutorService queue;
 
     private static final Logger logger = Logger.getLogger(IndexCreator.class.getName());
 
-    public IndexCreator(SQLDatabase database, Datastore datastore, ExecutorService queue) {
+    public IndexCreator(SQLDatabase database, DatastoreImpl datastore, ExecutorService queue) {
         this.datastore = datastore;
         this.database = database;
         this.queue = queue;
     }
 
-    protected static String ensureIndexed(Index index,
-                                          SQLDatabase database,
-                                          Datastore datastore,
-                                          ExecutorService queue) {
+    public static String ensureIndexed(Index index,
+                                       SQLDatabase database,
+                                       DatastoreImpl datastore,
+                                       ExecutorService queue) {
         IndexCreator executor = new IndexCreator(database, datastore, queue);
 
         return executor.ensureIndexed(index);
@@ -79,7 +81,7 @@ class IndexCreator {
         }
 
         if (proposedIndex.indexType == IndexType.TEXT) {
-            if (!IndexManager.ftsAvailable(queue, database)) {
+            if (!Query.ftsAvailable(queue, database)) {
                 logger.log(Level.SEVERE, "Text search not supported.  To add support for text " +
                                          "search, enable FTS compile options in SQLite.");
                 return null;
@@ -181,7 +183,7 @@ class IndexCreator {
                     parameters.put("index_settings", index.settingsAsJSON());
                     parameters.put("field_name", fieldName);
                     parameters.put("last_sequence", 0);
-                    long rowId = database.insert(IndexManager.INDEX_METADATA_TABLE_NAME,
+                    long rowId = database.insert(Query.INDEX_METADATA_TABLE_NAME,
                                                  parameters);
                     if (rowId < 0) {
                         transactionSuccess = false;
@@ -332,7 +334,7 @@ class IndexCreator {
         Future<Map<String, Object>> indexes = queue.submit(new Callable<Map<String, Object>>() {
             @Override
             public Map<String, Object> call() {
-                return IndexManager.listIndexesInDatabase(database);
+                return Query.listIndexesInDatabase(database);
             }
         });
 
@@ -340,7 +342,7 @@ class IndexCreator {
     }
 
     private String createIndexTableStatementForIndex(String indexName, List<String> columns) {
-        String tableName = String.format(Locale.ENGLISH, "\"%s\"", IndexManager.tableNameForIndex(indexName));
+        String tableName = String.format(Locale.ENGLISH, "\"%s\"", Query.tableNameForIndex(indexName));
         Joiner joiner = Joiner.on(" NONE,").skipNulls();
         String cols = joiner.join(columns);
 
@@ -348,7 +350,7 @@ class IndexCreator {
     }
 
     private String createIndexIndexStatementForIndex(String indexName, List<String> columns) {
-        String tableName = IndexManager.tableNameForIndex(indexName);
+        String tableName = Query.tableNameForIndex(indexName);
         String sqlIndexName = tableName.concat("_index");
         Joiner joiner = Joiner.on(",").skipNulls();
         String cols = joiner.join(columns);
@@ -370,7 +372,7 @@ class IndexCreator {
     private String createVirtualTableStatementForIndex(String indexName,
                                                        List<String> columns,
                                                        List<String> indexSettings) {
-        String tableName = String.format(Locale.ENGLISH, "\"%s\"", IndexManager
+        String tableName = String.format(Locale.ENGLISH, "\"%s\"", Query
                 .tableNameForIndex(indexName));
         Joiner joiner = Joiner.on(",").skipNulls();
         String cols = joiner.join(columns);

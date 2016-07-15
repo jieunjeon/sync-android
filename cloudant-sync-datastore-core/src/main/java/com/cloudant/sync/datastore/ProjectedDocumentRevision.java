@@ -28,14 +28,14 @@ public class ProjectedDocumentRevision extends DocumentRevision {
 
     private static final Logger logger = Logger.getLogger(ProjectedDocumentRevision.class.getCanonicalName());
 
-    Datastore datastore;
+    DatastoreImpl datastore;
 
     ProjectedDocumentRevision(String docId,
                               String revId,
                               boolean deleted,
                               List<? extends Attachment> attachments,
                               DocumentBody body,
-                              Datastore datastore) {
+                              DatastoreImpl datastore) {
         super(docId, revId,body);
 
         super.setDeleted(deleted);

@@ -12,7 +12,9 @@
 
 package com.cloudant.sync.query;
 
-final class QueryConstants {
+import com.cloudant.sync.datastore.Query;
+
+public final class QueryConstants {
 
     public static final String AND = "$and";
 
@@ -52,7 +54,7 @@ final class QueryConstants {
 
     public static String[] getSchemaVersion1() {
         return new String[] {
-                "CREATE TABLE " + IndexManager.INDEX_METADATA_TABLE_NAME + " ( " +
+                "CREATE TABLE " + Query.INDEX_METADATA_TABLE_NAME + " ( " +
                 "        index_name TEXT NOT NULL, " +
                 "        index_type TEXT NOT NULL, " +
                 "        field_name TEXT NOT NULL, " +
@@ -62,7 +64,7 @@ final class QueryConstants {
 
     public static String[] getSchemaVersion2() {
         return new String[] {
-                "ALTER TABLE " + IndexManager.INDEX_METADATA_TABLE_NAME +
+                "ALTER TABLE " + Query.INDEX_METADATA_TABLE_NAME +
                 "        ADD COLUMN index_settings TEXT NULL;"
         };
     }

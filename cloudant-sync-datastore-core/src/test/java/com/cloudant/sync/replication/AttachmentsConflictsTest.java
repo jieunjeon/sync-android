@@ -73,7 +73,7 @@ public class AttachmentsConflictsTest extends ReplicationTestBase {
         this.datastoreManager.deleteDatastore(this.datastore.getDatastoreName());
         Datastore proxy = this.datastoreManager.openDatastore("foo-bar-baz");
         DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
-        this.datastore = datastoreFasçde.getDatastoreImplementation();
+        this.datastoreImpl = datastoreFasçde.getDatastoreImplementation();
         this.pull();
 
         DocumentRevision gotRev = this.datastore.getDocument("doc-a");
@@ -125,7 +125,7 @@ public class AttachmentsConflictsTest extends ReplicationTestBase {
         this.datastoreManager.deleteDatastore(this.datastore.getDatastoreName());
         Datastore proxy = this.datastoreManager.openDatastore("foo-bar-baz");
         DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
-        this.datastore = datastoreFasçde.getDatastoreImplementation();
+        this.datastoreImpl = datastoreFasçde.getDatastoreImplementation();
         this.pull();
 
         DocumentRevision gotRev = this.datastore.getDocument("doc-a");

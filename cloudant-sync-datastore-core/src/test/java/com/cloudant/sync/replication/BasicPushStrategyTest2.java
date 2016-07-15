@@ -117,21 +117,21 @@ public class BasicPushStrategyTest2 extends ReplicationTestBase {
         checkAllDocumentAreSynced();
 
         {
-            DocumentRevisionTree t1 = datastore.getAllRevisionsOfDocument(id1);
+            DocumentRevisionTree t1 = datastoreImpl.getAllRevisionsOfDocument(id1);
             Assert.assertEquals(2, t1.leafs().size());
             DocumentRevision c = t1.getCurrentRevision();
             Assert.assertEquals(4, t1.depth(c.getSequence()));
         }
 
         {
-            DocumentRevisionTree t2 = datastore.getAllRevisionsOfDocument(id2);
+            DocumentRevisionTree t2 = datastoreImpl.getAllRevisionsOfDocument(id2);
             Assert.assertEquals(2, t2.leafs().size());
             DocumentRevision c = t2.getCurrentRevision();
             Assert.assertEquals(2, t2.depth(c.getSequence()));
         }
 
         {
-            DocumentRevisionTree t3 = datastore.getAllRevisionsOfDocument(id3);
+            DocumentRevisionTree t3 = datastoreImpl.getAllRevisionsOfDocument(id3);
             Assert.assertEquals(2, t3.leafs().size());
             DocumentRevision c = t3.getCurrentRevision();
             Assert.assertEquals(4, t3.depth(c.getSequence()));

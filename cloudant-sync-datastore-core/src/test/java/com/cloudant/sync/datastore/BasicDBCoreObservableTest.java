@@ -88,9 +88,9 @@ public class BasicDBCoreObservableTest {
         Assert.assertEquals(3L, testObserver.getSequence());
     }
 
-    public static class TestObserver {        
-        Datastore core ;
-        public TestObserver(Datastore core) {
+    public static class TestObserver {
+        DatastoreImpl core ;
+        public TestObserver(DatastoreImpl core) {
             this.core = core;
         }
 

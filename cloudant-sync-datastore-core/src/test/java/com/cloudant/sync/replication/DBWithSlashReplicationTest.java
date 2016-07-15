@@ -84,7 +84,7 @@ public class DBWithSlashReplicationTest extends ReplicationTestBase {
 
         List<String> remoteRevs = ClientTestUtils.getRemoteRevisionIDs(getURI);
         List<String> localRevs = new ArrayList<String>();
-        DocumentRevisionTree localRevsTree = datastore.getAllRevisionsOfDocument(bar.getId());
+        DocumentRevisionTree localRevsTree = datastoreImpl.getAllRevisionsOfDocument(bar.getId());
 
         Map<Long, DocumentRevisionTree.DocumentRevisionNode> roots = localRevsTree.roots();
         Set<Long> rootSet = roots.keySet();
@@ -118,7 +118,7 @@ public class DBWithSlashReplicationTest extends ReplicationTestBase {
         //compare local revs to remote
         remoteRevs = ClientTestUtils.getRemoteRevisionIDs(getURI);
         localRevs = new ArrayList<String>();
-        localRevsTree = datastore.getAllRevisionsOfDocument(bar.getId());
+        localRevsTree = datastoreImpl.getAllRevisionsOfDocument(bar.getId());
 
         roots = localRevsTree.roots();
         rootSet = roots.keySet();

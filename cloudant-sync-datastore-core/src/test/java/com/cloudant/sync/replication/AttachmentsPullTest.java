@@ -68,7 +68,7 @@ public class AttachmentsPullTest extends ReplicationTestBase {
         } catch (Exception e) {
             Assert.fail("Pull error " + e);
         }
-        Attachment a = datastore.getAttachment(id, rev, attachmentName);
+        Attachment a = datastoreImpl.getAttachment(id, rev, attachmentName);
         Assert.assertNotNull("Attachment is null", a);
         Assert.assertEquals(attachmentName, a.name);
         try {
@@ -85,7 +85,7 @@ public class AttachmentsPullTest extends ReplicationTestBase {
         } catch (Exception e) {
             Assert.fail("Pull error " + e);
         }
-        Attachment a2 = datastore.getAttachment(id, rev, attachmentName);
+        Attachment a2 = datastoreImpl.getAttachment(id, rev, attachmentName);
         Assert.assertNotNull("Attachment is null", a2);
         Assert.assertEquals(attachmentName, a2.name);
         try {
@@ -104,7 +104,7 @@ public class AttachmentsPullTest extends ReplicationTestBase {
         } catch (Exception e) {
             Assert.fail("Create/pull error " + e);
         }
-        Attachment a = datastore.getAttachment(id, rev, bigAttachmentName);
+        Attachment a = datastoreImpl.getAttachment(id, rev, bigAttachmentName);
         Assert.assertNotNull("Attachment is null", a);
         Assert.assertEquals(bigAttachmentName, a.name);
         try {
@@ -123,7 +123,7 @@ public class AttachmentsPullTest extends ReplicationTestBase {
         } catch (Exception e) {
             Assert.fail("Create/pull error " + e);
         }
-        Attachment a = datastore.getAttachment(id, rev, bigTextAttachmentName);
+        Attachment a = datastoreImpl.getAttachment(id, rev, bigTextAttachmentName);
         Assert.assertNotNull("Attachment is null", a);
         Assert.assertEquals(bigTextAttachmentName, a.name);
 
@@ -168,10 +168,10 @@ public class AttachmentsPullTest extends ReplicationTestBase {
             // ensure updated version no longer has attachment associated with it locally
             createRevisionAndBigTextAttachment();
             pull();
-            Attachment a1 = datastore.getAttachment(id, rev, bigTextAttachmentName);
+            Attachment a1 = datastoreImpl.getAttachment(id, rev, bigTextAttachmentName);
             updateRevision();
             pull();
-            Attachment a2 = datastore.getAttachment(id, rev, bigTextAttachmentName);
+            Attachment a2 = datastoreImpl.getAttachment(id, rev, bigTextAttachmentName);
             Assert.assertNull(a2);
 
         } catch (Exception e) {
@@ -187,11 +187,11 @@ public class AttachmentsPullTest extends ReplicationTestBase {
             // TODO we need to somehow check the attachment wasn't re-downloaded
             createRevisionAndBigTextAttachment();
             pull();
-            Attachment a1 = datastore.getAttachment(id, rev, bigTextAttachmentName);
+            Attachment a1 = datastoreImpl.getAttachment(id, rev, bigTextAttachmentName);
             updateRevisionAndKeepAttachment();
             updateRevisionAndKeepAttachment();
             pull();
-            Attachment a2 = datastore.getAttachment(id, rev, bigTextAttachmentName);
+            Attachment a2 = datastoreImpl.getAttachment(id, rev, bigTextAttachmentName);
             Assert.assertNotNull(a2);
 
         } catch (Exception e) {

@@ -297,7 +297,7 @@ public class DatastoreImplCRUDTest extends BasicDatastoreTestBase {
 
     @Test
     public void getLastSequence_noDocuments_ShouldBeMinusOne() {
-        Assert.assertEquals(DatastoreImpl.SEQUENCE_NUMBER_START, datastore.getLastSequence());
+        Assert.assertEquals(Datastore.SEQUENCE_NUMBER_START, datastore.getLastSequence());
     }
 
     @Test

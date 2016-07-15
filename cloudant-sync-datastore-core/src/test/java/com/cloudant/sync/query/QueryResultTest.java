@@ -39,13 +39,6 @@ public class QueryResultTest extends AbstractQueryTestBase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        im = new IndexManager(ds);
-        assertThat(im, is(notNullValue()));
-        db = TestUtils.getDatabaseConnectionToExistingDb(im.getDatabase());
-        assertThat(db, is(notNullValue()));
-        assertThat(im.getQueue(), is(notNullValue()));
-        String[] metadataTableList = new String[]{IndexManager.INDEX_METADATA_TABLE_NAME};
-        SQLDatabaseTestUtils.assertTablesExist(db, metadataTableList);
 
         queue = new SQLDatabaseQueue(factoryPath + "/" + factory.listAllDatastores().get(0) +
             "/db.sync", new NullKeyProvider());
@@ -61,14 +54,14 @@ public class QueryResultTest extends AbstractQueryTestBase {
     public void testQueryGetDocumentsWithIdsFails() throws InterruptedException,
         ExecutionException {
         List<Object> fields = Collections.<Object>singletonList("pet");
-        assertThat(im.ensureIndexed(fields, "basic_text", IndexType.TEXT), is("basic_text"));
+        assertThat(ds.ensureIndexed(fields, "basic_text", IndexType.TEXT), is("basic_text"));
 
         // query - { "$text" : { "$search" : "cat" } }
         Map<String, Object> search = new HashMap<String, Object>();
         search.put("$search", "cat");
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$text", search);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
 
         queue.submit(new SQLQueueCallable<Void>() {
             @Override

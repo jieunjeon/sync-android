@@ -182,7 +182,7 @@ public class PullStrategyTest extends ReplicationTestBase {
 
         this.pull(replicator, 1);
 
-        DocumentRevisionTree docTree = datastore.getAllRevisionsOfDocument(bar1.getId());
+        DocumentRevisionTree docTree = datastoreImpl.getAllRevisionsOfDocument(bar1.getId());
         Assert.assertEquals(3, docTree.leafs().size());
         List<String> leafRevs = findRevisionOfLeafs(docTree);
         Assert.assertThat(leafRevs, hasItems(openRevs));
@@ -284,7 +284,7 @@ public class PullStrategyTest extends ReplicationTestBase {
     }
 
     private void resetCheckpoint() throws Exception {
-        DatastoreWrapper wrapper = new DatastoreWrapper(this.datastore);
+        DatastoreWrapper wrapper = new DatastoreWrapper(this.datastoreImpl);
         wrapper.putCheckpoint(this.remoteDb.getIdentifier(), "0");
     }
 

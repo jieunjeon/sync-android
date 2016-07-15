@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.runners.Parameterized.Parameters;
 
+import com.cloudant.sync.datastore.Datastore;
 import com.cloudant.sync.util.SQLDatabaseTestUtils;
 import com.cloudant.sync.util.TestUtils;
 
@@ -28,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,16 +77,10 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
     public void setUp() throws Exception {
         super.setUp();
         if (testType.equals(MATCHER_EXECUTION)) {
-            im = new MockMatcherIndexManager(ds);
+            ds = (Datastore)Proxy.newProxyInstance(Datastore.class.getClassLoader(),new Class[]{Datastore.class}, new NoSQLMatcherInovcationHandler(ds));
         } else if (testType.equals(STANDARD_EXECUTION)) {
-            im = new IndexManager(ds);
+            // the default is to the standard execution, therefore we do not do anything here.
         }
-        assertThat(im, is(notNullValue()));
-        db = TestUtils.getDatabaseConnectionToExistingDb(im.getDatabase());
-        assertThat(db, is(notNullValue()));
-        assertThat(im.getQueue(), is(notNullValue()));
-        String[] metadataTableList = new String[] { IndexManager.INDEX_METADATA_TABLE_NAME };
-        SQLDatabaseTestUtils.assertTablesExist(db, metadataTableList);
     }
 
     // When executing AND queries
@@ -104,7 +100,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         //                                                                     "pet" ] } }
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("town", "bristol");
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike72", "fred12"));
     }
 
@@ -128,7 +124,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", op1);
         query.put("age", op2);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), contains("mike12"));
     }
 
@@ -147,7 +143,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         //                                                                     "pet" ] } }
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("town", "bristol");
-        QueryResult queryResult = im.find(query, 0, 0, Arrays.asList("name"), null);
+        QueryResult queryResult = ds.find(query, 0, 0, Arrays.asList("name"), null);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike72", "fred12"));
     }
 
@@ -176,7 +172,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         townEq.put("town", op2);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$or", Arrays.<Object>asList(petEq, townEq));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike12",
                                                                  "mike72",
                                                                  "fred34",
@@ -186,8 +182,8 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
     @Test
     public void canQueryORWithoutAnyIndexes() throws Exception {
         setUpWithoutCoveringIndexesQueryData();
-        im.deleteIndexNamed("pet");
-        assertThat(im.listIndexes().keySet(), contains("basic"));
+        ds.deleteIndexNamed("pet");
+        assertThat(ds.listIndexes().keySet(), contains("basic"));
         // query - { "$or" : [ { "pet" : { "$eq" : "cat" } }, { "town" : { "$eq" : "bristol" } } ] }
         // indexes - { "basic" : { "name" : "basic", "type" : "json", "fields" : [ "_id",
         //                                                                         "_rev",
@@ -203,7 +199,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         townEq.put("town", op2);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$or", Arrays.<Object>asList(petEq, townEq));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike12",
                                                                  "mike72",
                                                                  "fred34",
@@ -220,7 +216,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", 2);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike12", "fred34", "bill34"));
     }
 
@@ -232,7 +228,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", 3);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), is(empty()));
     }
 
@@ -244,7 +240,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", 1);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike24", "fred72"));
     }
 
@@ -256,7 +252,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", 0);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), contains("fred11"));
     }
 
@@ -268,7 +264,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", -1);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), is(empty()));
     }
 
@@ -280,7 +276,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", 1.6);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), is(empty()));
     }
 
@@ -292,7 +288,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", "dog");
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), is(empty()));
     }
 
@@ -304,7 +300,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         sizeOp.put("$size", Collections.singletonList(1));
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("pet", sizeOp);
-        assertThat(im.find(query), is(nullValue()));
+        assertThat(ds.find(query), is(nullValue()));
     }
 
     @Test
@@ -319,7 +315,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         name.put("name", "mike");
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$and", Arrays.<Object>asList(pet, name));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), contains("mike12"));
     }
 
@@ -335,7 +331,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         petEq.put("pet", "dog");
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$and", Arrays.<Object>asList(pet, petEq));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike12", "fred34"));
     }
 
@@ -351,7 +347,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         name.put("name", "john");
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$or", Arrays.<Object>asList(pet, name));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike24",
                                                                  "fred72",
                                                                  "john12",
@@ -372,7 +368,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         petOp2.put("pet", sizeOp2);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$or", Arrays.<Object>asList(petOp1, petOp2));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike24",
                                                                  "mike12",
                                                                  "fred34",
@@ -394,7 +390,7 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         petOp2.put("pet", sizeOp2);
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("$and", Arrays.<Object>asList(petOp1, petOp2));
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), is(empty()));
     }
 
@@ -404,13 +400,13 @@ public class QueryWithoutCoveringIndexesTest extends AbstractQueryTestBase {
         // query - { "town" : "bristol" }
         // indexes - No user defined indexes found.  Retrieves
         //           document ids directly from the datastore.
-        assertThat(im.deleteIndexNamed("basic"), is(true));
-        assertThat(im.deleteIndexNamed("pet"), is(true));
-        assertThat(im.listIndexes().keySet(), is(empty()));
+        assertThat(ds.deleteIndexNamed("basic"), is(true));
+        assertThat(ds.deleteIndexNamed("pet"), is(true));
+        assertThat(ds.listIndexes().keySet(), is(empty()));
 
         Map<String, Object> query = new HashMap<String, Object>();
         query.put("town", "bristol");
-        QueryResult queryResult = im.find(query);
+        QueryResult queryResult = ds.find(query);
         assertThat(queryResult.documentIds(), containsInAnyOrder("mike72", "fred12"));
     }
 

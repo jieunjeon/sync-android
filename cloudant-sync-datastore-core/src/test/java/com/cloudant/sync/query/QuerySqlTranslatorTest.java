@@ -43,11 +43,11 @@ public class QuerySqlTranslatorTest extends AbstractIndexTestBase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        indexName = im.ensureIndexed(Arrays.<Object>asList("name", "age", "pet"), "basic");
+        indexName = ds.ensureIndexed(Arrays.<Object>asList("name", "age", "pet"), "basic");
         assertThat(indexName, is("basic"));
-        textIndexName = im.ensureIndexed(Arrays.<Object>asList("comments"), "basic_text", IndexType.TEXT);
+        textIndexName = ds.ensureIndexed(Arrays.<Object>asList("comments"), "basic_text", IndexType.TEXT);
         assertThat(textIndexName, is("basic_text"));
-        indexes = im.listIndexes();
+        indexes = ds.listIndexes();
         assertThat(indexes.size(), is(2));
         indexesCoverQuery = new Boolean[]{ false };
         indexTable = String.format("_t_cloudant_sync_query_index_%s", indexName);
@@ -1227,7 +1227,7 @@ public class QuerySqlTranslatorTest extends AbstractIndexTestBase {
 
     @Test
     public void nullWhenTextSearchDoesNotFindTextIndex() {
-        assertThat(im.deleteIndexNamed("basic_text"), is(true));
+        assertThat(ds.deleteIndexNamed("basic_text"), is(true));
         // query - { "$text" : { "$search" : "foo bar baz" } }
         Map<String, Object> searchMap = new HashMap<String, Object>();
         searchMap.put("$search", "foo bar baz");
@@ -1236,14 +1236,14 @@ public class QuerySqlTranslatorTest extends AbstractIndexTestBase {
         query = QueryValidator.normaliseAndValidateQuery(query);
 
         QueryNode node = QuerySqlTranslator.translateQuery(query,
-                                                           im.listIndexes(),
+                                                           ds.listIndexes(),
                                                            indexesCoverQuery);
         assertThat(node, is(nullValue()));
     }
 
     @Test
     public void nullWhenCompoundQueryIncludesTextSearchDoesNotFindJsonIndex() {
-        assertThat(im.deleteIndexNamed("basic"), is(true));
+        assertThat(ds.deleteIndexNamed("basic"), is(true));
         // query - { "$and" : [ { "name" : "mike" }, { "$text" : { "$search" : "foo bar baz" } } ] }
         Map<String, Object> nameMap = new HashMap<String, Object>();
         nameMap.put("name", "mike");
@@ -1256,7 +1256,7 @@ public class QuerySqlTranslatorTest extends AbstractIndexTestBase {
         query = QueryValidator.normaliseAndValidateQuery(query);
 
         QueryNode node = QuerySqlTranslator.translateQuery(query,
-                                                           im.listIndexes(),
+                                                           ds.listIndexes(),
                                                            indexesCoverQuery);
         assertThat(node, is(nullValue()));
     }

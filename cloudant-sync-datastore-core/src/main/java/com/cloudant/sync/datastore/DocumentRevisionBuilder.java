@@ -54,7 +54,7 @@ public class DocumentRevisionBuilder {
     private long docInternalId = -1;
     private long parent = -1;
     private List<? extends Attachment> attachments = null;
-    private Datastore datastore = null;
+    private DatastoreImpl datastore = null;
 
     /**
      * <p>Builds and returns the {@link DocumentRevision} for this builder.</p>
@@ -166,7 +166,7 @@ public class DocumentRevisionBuilder {
      * @param datastore the datastore
      * @return the builder object for chained calls
      */
-    public DocumentRevisionBuilder setDatastore(Datastore datastore) {
+    public DocumentRevisionBuilder setDatastore(DatastoreImpl datastore) {
         this.datastore = datastore;
         return this;
     }

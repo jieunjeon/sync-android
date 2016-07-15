@@ -267,11 +267,11 @@ public class PushStrategyTest extends ReplicationTestBase {
                 .getPushBuilder().changeLimitPerBatch(1).build()).strategy;
 
         DocumentRevision rev = createDbObject("5-e", createDBBody("Tom"));
-        datastore.forceInsert(rev, "1-a", "2-b", "3-c", "4-d", "5-e");
+        datastoreImpl.forceInsert(rev, "1-a", "2-b", "3-c", "4-d", "5-e");
 
         // 5-x will be the winner
         DocumentRevision rev2 = createDbObject("5-x", createDBBody("Jerry"));
-        datastore.forceInsert(rev2, "1-a", "2-b", "3-c", "4-d", "5-x");
+        datastoreImpl.forceInsert(rev2, "1-a", "2-b", "3-c", "4-d", "5-x");
 
         this.push(replicator, 1);
         // two tree belongs to one doc
@@ -290,11 +290,11 @@ public class PushStrategyTest extends ReplicationTestBase {
                 .getPushBuilder().changeLimitPerBatch(1).build()).strategy;
 
         DocumentRevision rev = createDbObject("4-d", createDBBody("Tom"));
-        datastore.forceInsert(rev, "1-a", "2-b", "3-c", "4-d");
+        datastoreImpl.forceInsert(rev, "1-a", "2-b", "3-c", "4-d");
 
         // 4-d will be the winner
         DocumentRevision rev2 = createDbObject("3-z", createDBBody("Jerry"));
-        datastore.forceInsert(rev2, "1-x", "2-y", "3-z");
+        datastoreImpl.forceInsert(rev2, "1-x", "2-y", "3-z");
 
         this.push(replicator, 1);
 

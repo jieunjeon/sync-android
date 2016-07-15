@@ -12,7 +12,8 @@
 
 package com.cloudant.sync.query;
 
-import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreImpl;
+import com.cloudant.sync.datastore.Query;
 import com.cloudant.sync.sqlite.Cursor;
 import com.cloudant.sync.sqlite.SQLDatabase;
 import com.cloudant.sync.util.DatabaseUtils;
@@ -35,10 +36,10 @@ import java.util.logging.Logger;
 /**
  *  Handles querying indexes for a given datastore.
  */
-class QueryExecutor {
+public class QueryExecutor {
 
     private final SQLDatabase database;
-    private final Datastore datastore;
+    private final DatastoreImpl datastore;
     private final ExecutorService queue;
 
     private static final Logger logger = Logger.getLogger(QueryExecutor.class.getName());
@@ -49,7 +50,7 @@ class QueryExecutor {
      *  Constructs a new QueryExecutor using the indexes in 'database' to find documents from
      *  'datastore'.
      */
-    QueryExecutor(SQLDatabase database, Datastore datastore, ExecutorService queue) {
+    public QueryExecutor(SQLDatabase database, DatastoreImpl datastore, ExecutorService queue) {
         this.database = database;
         this.datastore = datastore;
         this.queue = queue;
@@ -360,7 +361,7 @@ class QueryExecutor {
             return null;
         }
 
-        String indexTable = IndexManager.tableNameForIndex(chosenIndex);
+        String indexTable = Query.tableNameForIndex(chosenIndex);
 
         // for small result sets:
         // SELECT _id FROM idx WHERE _id IN (?, ?) ORDER BY fieldName ASC, fieldName2 DESC

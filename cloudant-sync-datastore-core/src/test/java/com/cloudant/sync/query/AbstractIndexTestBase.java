@@ -33,9 +33,9 @@ public abstract class AbstractIndexTestBase {
 
     String factoryPath = null;
     DatastoreManager factory = null;
-    DatastoreImpl ds = null;
-    IndexManager im = null;
-    SQLDatabase db = null;
+    Datastore ds = null;
+    DatastoreImpl dsImpl = null;
+
 
     @Before
     public void setUp() throws Exception {
@@ -44,31 +44,18 @@ public abstract class AbstractIndexTestBase {
         factory = DatastoreManager.getInstance(factoryPath);
         assertThat(factory, is(notNullValue()));
 
-        Datastore proxy = this.factory.openDatastore(getClass().getSimpleName());
-        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(proxy);
-        this.ds = datastoreFasçde.getDatastoreImplementation();
+         ds = this.factory.openDatastore(getClass().getSimpleName());
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(ds);
+        this.dsImpl = datastoreFasçde.getDatastoreImplementation();
 
         assertThat(ds, is(notNullValue()));
-        im = new IndexManager(ds);
-        assertThat(im, is(notNullValue()));
-        db = TestUtils.getDatabaseConnectionToExistingDb(im.getDatabase());
-        assertThat(db, is(notNullValue()));
-        assertThat(im.getQueue(), is(notNullValue()));
-        String[] metadataTableList = new String[] { IndexManager.INDEX_METADATA_TABLE_NAME };
-        SQLDatabaseTestUtils.assertTablesExist(TestUtils.getDatabaseConnectionToExistingDb(db),
-                                               metadataTableList);
+
     }
 
     @After
     public void tearDown() {
-        im.close();
-        assertThat(im.getQueue().isShutdown(), is(true));
-        TestUtils.deleteDatabaseQuietly(db);
         ds.close();
         TestUtils.deleteTempTestingDir(factoryPath);
-
-        db = null;
-        im = null;
         ds = null;
         factory = null;
         factoryPath = null;

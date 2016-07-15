@@ -15,7 +15,9 @@ package com.cloudant.sync.query;
 import com.cloudant.android.ContentValues;
 import com.cloudant.sync.datastore.Changes;
 import com.cloudant.sync.datastore.Datastore;
+import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentRevision;
+import com.cloudant.sync.datastore.Query;
 import com.cloudant.sync.sqlite.Cursor;
 import com.cloudant.sync.sqlite.SQLDatabase;
 import com.cloudant.sync.util.DatabaseUtils;
@@ -35,10 +37,10 @@ import java.util.logging.Logger;
 /**
  *  Handles updating indexes for a given datastore.
  */
-class IndexUpdater {
+public class IndexUpdater {
 
     private final SQLDatabase database;
-    private final Datastore datastore;
+    private final DatastoreImpl datastore;
 
     private final ExecutorService queue;
 
@@ -48,7 +50,7 @@ class IndexUpdater {
      *  Constructs a new CDTQQueryExecutor using the indexes in 'database' to index documents from
      *  'datastore'.
      */
-    public IndexUpdater(SQLDatabase database, Datastore datastore, ExecutorService queue) {
+    public IndexUpdater(SQLDatabase database, DatastoreImpl datastore, ExecutorService queue) {
         this.datastore = datastore;
         this.database = database;
         this.queue = queue;
@@ -67,7 +69,7 @@ class IndexUpdater {
      */
     public static boolean updateAllIndexes(Map<String, Object> indexes,
                                            SQLDatabase database,
-                                           Datastore datastore,
+                                           DatastoreImpl datastore,
                                            ExecutorService queue) {
         IndexUpdater updater = new IndexUpdater(database, datastore, queue);
 
@@ -89,7 +91,7 @@ class IndexUpdater {
     public static boolean updateIndex(String indexName,
                                       List<String> fieldNames,
                                       SQLDatabase database,
-                                      Datastore datastore,
+                                      DatastoreImpl datastore,
                                       ExecutorService queue) {
         IndexUpdater updater = new IndexUpdater(database, datastore, queue);
 
@@ -146,7 +148,7 @@ class IndexUpdater {
                 database.beginTransaction();
                 for (DocumentRevision rev: changes.getResults()) {
                     // Delete existing values
-                    String tableName = IndexManager.tableNameForIndex(indexName);
+                    String tableName = Query.tableNameForIndex(indexName);
                     database.delete(tableName, " _id = ? ", new String[]{rev.getId()});
 
                     // Insert new values if the rev isn't deleted
@@ -349,7 +351,7 @@ class IndexUpdater {
             }
             argIndex = argIndex + 1;
         }
-        String tableName = IndexManager.tableNameForIndex(indexName);
+        String tableName = Query.tableNameForIndex(indexName);
 
         return new DBParameter(tableName, contentValues);
     }
@@ -360,7 +362,7 @@ class IndexUpdater {
             public Long call() {
                 long result = 0;
                 String sql = String.format("SELECT last_sequence FROM %s WHERE index_name = ?",
-                                           IndexManager.INDEX_METADATA_TABLE_NAME);
+                                           Query.INDEX_METADATA_TABLE_NAME);
                 Cursor cursor = null;
                 try {
                     cursor = database.rawQuery(sql, new String[]{ indexName });
@@ -397,7 +399,7 @@ class IndexUpdater {
                 boolean updateSuccess = true;
                 ContentValues v = new ContentValues();
                 v.put("last_sequence", lastSequence);
-                int row = database.update(IndexManager.INDEX_METADATA_TABLE_NAME,
+                int row = database.update(Query.INDEX_METADATA_TABLE_NAME,
                                           v,
                                           " index_name = ? ",
                                           new String[]{ indexName });

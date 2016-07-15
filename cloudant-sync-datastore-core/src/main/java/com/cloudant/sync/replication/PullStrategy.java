@@ -22,6 +22,7 @@ import com.cloudant.mazha.DocumentRevs;
 import com.cloudant.sync.datastore.Attachment;
 import com.cloudant.sync.datastore.Datastore;
 import com.cloudant.sync.datastore.DatastoreException;
+import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentException;
 import com.cloudant.sync.datastore.DocumentRevsList;
@@ -36,6 +37,7 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -106,7 +108,8 @@ class PullStrategy implements ReplicationStrategy {
         this.filter = filter;
         this.sourceDb = new CouchClientWrapper(new CouchClient(source, requestInterceptors,
                 responseInterceptors));
-        this.targetDb = new DatastoreWrapper((DatastoreImpl) target);
+        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(target);
+        this.targetDb = new DatastoreWrapper(datastoreFasçde.getDatastoreImplementation());
         String replicatorName;
         if (filter == null) {
             replicatorName = String.format("%s <-- %s ", target.getDatastoreName(), source);
