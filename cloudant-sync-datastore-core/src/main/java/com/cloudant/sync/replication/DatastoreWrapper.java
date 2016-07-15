@@ -29,6 +29,7 @@ import com.cloudant.sync.datastore.DocumentRevsUtils;
 import com.cloudant.sync.datastore.ForceInsertItem;
 import com.cloudant.sync.datastore.LocalDocument;
 import com.cloudant.sync.datastore.PreparedAttachment;
+import com.cloudant.sync.datastore.ReplicatorDatastore;
 import com.cloudant.sync.util.JSONUtils;
 
 import java.util.ArrayList;
@@ -42,13 +43,13 @@ class DatastoreWrapper {
 
     private final static Logger logger = Logger.getLogger(DatastoreWrapper.class.getCanonicalName());
 
-    private DatastoreImpl dbCore;
+    private ReplicatorDatastore dbCore;
 
-    public DatastoreWrapper(DatastoreImpl dbCore) {
+    public DatastoreWrapper(ReplicatorDatastore dbCore) {
         this.dbCore = dbCore;
     }
 
-    public DatastoreImpl getDbCore() {
+    public ReplicatorDatastore getDbCore() {
         return dbCore;
     }
 

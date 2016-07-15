@@ -28,6 +28,7 @@ import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentRevision;
 import com.cloudant.sync.datastore.DocumentRevisionTree;
 import com.cloudant.sync.datastore.MultipartAttachmentWriter;
+import com.cloudant.sync.datastore.ReplicatorDatastore;
 import com.cloudant.sync.datastore.RevisionHistoryHelper;
 import com.cloudant.sync.event.EventBus;
 import com.cloudant.sync.util.JSONUtils;
@@ -102,8 +103,7 @@ class PushStrategy implements ReplicationStrategy {
                         URI target,
                         List<HttpConnectionRequestInterceptor> requestInterceptors,
                         List<HttpConnectionResponseInterceptor> responseInterceptors) {
-        DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(source);
-        this.sourceDb = new DatastoreWrapper(datastoreFasçde.getDatastoreImplementation());
+        this.sourceDb = new DatastoreWrapper((ReplicatorDatastore) source);
         this.targetDb = new CouchClientWrapper(new CouchClient(target, requestInterceptors, responseInterceptors));
         String replicatorName = String.format("%s <-- %s ", target, source.getDatastoreName());
         this.name = String.format("%s [%s]", LOG_TAG, replicatorName);

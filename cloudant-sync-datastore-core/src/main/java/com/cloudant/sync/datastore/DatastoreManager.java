@@ -338,7 +338,7 @@ public class DatastoreManager {
 
             //Pass database directory, database name, and SQLCipher key provider
             Datastore ds = (Datastore) Proxy.newProxyInstance(Datastore.class.getClassLoader(),
-                    new Class<?>[]{Datastore.class}, new DatastoreFaçade(dbDirectory, dbName, provider));
+                    new Class<?>[]{Datastore.class, ReplicatorDatastore.class}, new DatastoreFaçade(dbDirectory, dbName, provider));
 
             if(!dbDirectoryExist) {
                 this.eventBus.post(new DatabaseCreated(dbName));

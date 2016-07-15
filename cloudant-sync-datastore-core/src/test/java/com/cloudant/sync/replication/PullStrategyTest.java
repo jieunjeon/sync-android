@@ -26,6 +26,7 @@ import com.cloudant.mazha.Response;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DocumentRevision;
 import com.cloudant.sync.datastore.DocumentRevisionTree;
+import com.cloudant.sync.datastore.ReplicatorDatastore;
 import com.cloudant.sync.query.IndexManager;
 import com.cloudant.sync.query.QueryResult;
 import com.google.common.collect.ImmutableMap;
@@ -193,7 +194,7 @@ public class PullStrategyTest extends ReplicationTestBase {
 
     @Test
     public void pull_localDbError_replicationAbort() throws Exception {
-        DatastoreImpl localDb = mock(DatastoreImpl.class);
+        ReplicatorDatastore localDb = mock(ReplicatorDatastore.class);
 
         PullStrategy replication = super.getPullStrategy();
         replication.targetDb = new DatastoreWrapper(localDb);
@@ -284,7 +285,7 @@ public class PullStrategyTest extends ReplicationTestBase {
     }
 
     private void resetCheckpoint() throws Exception {
-        DatastoreWrapper wrapper = new DatastoreWrapper(this.datastoreImpl);
+        DatastoreWrapper wrapper = new DatastoreWrapper((ReplicatorDatastore)this.datastore);
         wrapper.putCheckpoint(this.remoteDb.getIdentifier(), "0");
     }
 

@@ -18,6 +18,7 @@ import com.cloudant.sync.query.IndexManager;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
@@ -49,11 +50,16 @@ public class DatastoreFaçade implements InvocationHandler {
         }
 
         try {
-            Method targetMethod = datastoreClazz.getMethod(method.getName(), method.getParameterTypes());
-            return targetMethod.invoke(datastore, args);
-        } catch (NoSuchMethodException e){
-            Method targetMethod = queryClazz.getMethod(method.getName(), method.getParameterTypes());
-            return targetMethod.invoke(query, args);
+            try {
+                Method targetMethod = datastoreClazz.getMethod(method.getName(), method.getParameterTypes());
+
+                return targetMethod.invoke(datastore, args);
+            } catch (NoSuchMethodException e) {
+                Method targetMethod = queryClazz.getMethod(method.getName(), method.getParameterTypes());
+                return targetMethod.invoke(query, args);
+            }
+        } catch (InvocationTargetException e){
+            throw e.getCause();
         }
     }
 

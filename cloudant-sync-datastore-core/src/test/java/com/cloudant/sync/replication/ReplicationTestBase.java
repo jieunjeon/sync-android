@@ -23,6 +23,7 @@ import com.cloudant.sync.datastore.Datastore;
 import com.cloudant.sync.datastore.DatastoreFaçade;
 import com.cloudant.sync.datastore.DatastoreImpl;
 import com.cloudant.sync.datastore.DatastoreManager;
+import com.cloudant.sync.datastore.ReplicatorDatastore;
 import com.cloudant.sync.sqlite.SQLDatabase;
 import com.cloudant.sync.util.TestUtils;
 
@@ -71,7 +72,7 @@ public abstract class ReplicationTestBase extends CouchTestBase {
         datastore = this.datastoreManager.openDatastore(getClass().getSimpleName());
         DatastoreFaçade datastoreFasçde = (DatastoreFaçade) Proxy.getInvocationHandler(datastore);
         this.datastoreImpl = datastoreFasçde.getDatastoreImplementation();
-        datastoreWrapper = new DatastoreWrapper(datastoreImpl);
+        datastoreWrapper = new DatastoreWrapper((ReplicatorDatastore)datastore);
     }
 
     protected void createRemoteDB() {
