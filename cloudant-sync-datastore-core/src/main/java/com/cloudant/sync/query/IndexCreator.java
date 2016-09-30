@@ -165,11 +165,9 @@ class IndexCreator {
         }
 
         final Index index = proposedIndex;
-        Future<Boolean> result = queue.submit(new SQLCallable<Boolean>() {
+        Future<Void> result = queue.submitTransaction(new SQLCallable<Void>() {
             @Override
-            public Boolean call(SQLDatabase database) {
-                Boolean transactionSuccess = true;
-                database.beginTransaction();
+            public Void call(SQLDatabase database) throws QueryException {
 
                 // Insert metadata table entries
                 for (String fieldName: fieldNamesList) {
@@ -182,8 +180,7 @@ class IndexCreator {
                     long rowId = database.insert(IndexManagerImpl.INDEX_METADATA_TABLE_NAME,
                                                  parameters);
                     if (rowId < 0) {
-                        transactionSuccess = false;
-                        break;
+                        throw new QueryException("Error inserting index metadata");
                     }
                 }
 
@@ -214,42 +211,28 @@ class IndexCreator {
                         database.execSQL(statement);
                     } catch (SQLException e) {
                         String msg = String.format("Index creation error occurred (%s):",statement);
-                        logger.log(Level.SEVERE, msg, e);
-                        transactionSuccess = false;
-                        break;
+                        throw new QueryException(msg, e);
                     }
                 }
-
-                if (transactionSuccess) {
-                    database.setTransactionSuccessful();
-                }
-                database.endTransaction();
-
-                return transactionSuccess;
+                return null;
             }
         });
 
         // Update the new index if it's been created
-        boolean success;
         try {
-            success = result.get();
+            result.get();
         } catch (ExecutionException e) {
-            logger.log(Level.SEVERE, "Execution error encountered:", e);
-            return null;
+            throw new QueryException("Execution error encountered:", e);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Execution interrupted error encountered:", e);
-            return null;
+            throw new QueryException("Execution interrupted error encountered:", e);
         }
 
-        if (success) {
-            IndexUpdater.updateIndex(index.indexName,
-                                               fieldNamesList,
-                    database,
-                                               queue);
-        }
+        IndexUpdater.updateIndex(index.indexName,
+                fieldNamesList,
+                database,
+                queue);
 
-        // TODO if we weren't successful throw an exception explaining why
-        return success ? index.indexName : null;
+        return index.indexName;
     }
 
     /**

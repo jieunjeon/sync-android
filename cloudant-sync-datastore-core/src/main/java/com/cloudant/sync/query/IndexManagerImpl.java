@@ -330,8 +330,7 @@ public class IndexManagerImpl implements IndexManager {
                             List<String> fields,
                             List<FieldSort> sortDocument) throws QueryException {
         if (query == null) {
-            logger.log(Level.SEVERE, "-find called with null selector; bailing.");
-            return null;
+            throw new QueryException("Query must not be null");
         }
 
         updateAllIndexes();

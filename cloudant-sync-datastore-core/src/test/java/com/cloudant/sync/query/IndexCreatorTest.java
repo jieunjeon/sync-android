@@ -185,7 +185,6 @@ public class IndexCreatorTest extends AbstractIndexTestBase {
         assertThat(indexName, is("basic"));
     }
 
-    // TODO should this throw an exception
     @Test
     public void createIndexWhenIndexNameExistsIdxDefinitionDifferent() throws QueryException {
         String indexName = im.ensureIndexed(Arrays.<FieldSort>asList(
@@ -194,10 +193,14 @@ public class IndexCreatorTest extends AbstractIndexTestBase {
         assertThat(indexName, is("basic"));
 
         // fails when the index definition is different
-        indexName = im.ensureIndexed(Arrays.<FieldSort>asList(
-                new FieldSort("name", FieldSort.Direction.ASCENDING),
-                new FieldSort("pet", FieldSort.Direction.DESCENDING)), "basic");
-        assertThat(indexName, is(nullValue()));
+        try {
+            indexName = im.ensureIndexed(Arrays.<FieldSort>asList(
+                    new FieldSort("name", FieldSort.Direction.ASCENDING),
+                    new FieldSort("pet", FieldSort.Direction.DESCENDING)), "basic");
+            Assert.fail("ensureIndexed should throw QueryException");
+        } catch (QueryException qe) {
+            ;
+        }
     }
 
     @Test
