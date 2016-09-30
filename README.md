@@ -268,8 +268,7 @@ Read more in [the replication docs](https://github.com/cloudant/sync-android/blo
 #### Authentication
 
 Sync-android uses session cookies by default to authenticate with the server if
-credentials are provided with in the URL. If you need more fine grain control
-over authentication, for example if you are using a proxy, you can use
+credentials are provided with in the URL. If you want more fine-grained control over authentication, provide an interceptor to perform the authentication for each request. For example, if you are using middleware such as [Envoy][envoy], you can use
 the `BasicAuthInterceptor` to add basic authentication to requests.
 
 Example:
@@ -286,6 +285,7 @@ either using the in built interceptors (see the `com.cloudant.http.interceptors`
 package) or by creating your own class which conforms to
 `HttpConnectionRequestInterceptor` or `HttpConnectionResponseInterceptor`.
 
+[envoy]: https://github.com/cloudant-labs/envoy
 ### Finding data
 
 Once you have thousands of documents in a database, it's important to have
