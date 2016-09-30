@@ -193,7 +193,8 @@ public class QueryResult implements Iterable<DocumentRevision> {
                 }
                 return docList.iterator();
             } catch (DocumentException e) {
-                throw new QueryException(e);
+                // TODO - not sure what the right thing is here
+                throw new NoSuchElementException(e.toString());
             }
         }
     }
