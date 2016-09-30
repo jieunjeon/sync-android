@@ -35,8 +35,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.management.Query;
-
 /**
  *  Handles creating indexes for a given datastore.
  */
