@@ -317,7 +317,7 @@ class IndexUpdater {
         return new DBParameter(tableName, contentValues);
     }
 
-    private long sequenceNumberForIndex(final String indexName) {
+    private long sequenceNumberForIndex(final String indexName) throws QueryException {
         Future<Long> sequenceNumber = queue.submit( new SQLCallable<Long>() {
             @Override
             public Long call(SQLDatabase database) {
@@ -345,19 +345,18 @@ class IndexUpdater {
         try {
             lastSequenceNumber = sequenceNumber.get();
         } catch (ExecutionException e) {
-            logger.log(Level.SEVERE, "Execution error encountered:", e);
+            throw new QueryException("Execution error encountered:", e);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Execution interrupted error encountered:", e);
+            throw new QueryException("Execution interrupted error encountered:", e);
         }
 
         return lastSequenceNumber;
     }
 
-    private boolean updateMetadataForIndex(final String indexName, final long lastSequence) {
-        Future<Boolean> result = queue.submit(new SQLCallable<Boolean>() {
+    private void updateMetadataForIndex(final String indexName, final long lastSequence) throws QueryException {
+        Future<Void> result = queue.submit(new SQLCallable<Void>() {
             @Override
-            public Boolean call(SQLDatabase database) {
-                boolean updateSuccess = true;
+            public Void call(SQLDatabase database) throws QueryException {
                 ContentValues v = new ContentValues();
                 v.put("last_sequence", lastSequence);
                 int row = database.update(IndexManagerImpl.INDEX_METADATA_TABLE_NAME,
@@ -365,24 +364,19 @@ class IndexUpdater {
                                           " index_name = ? ",
                                           new String[]{ indexName });
                 if (row <= 0) {
-                    updateSuccess = false;
+                    throw new QueryException("Failed to update index metadata for index "+indexName);
                 }
-                return updateSuccess;
+                return null;
             }
         });
 
-        boolean success;
         try {
-            success = result.get();
+            result.get();
         } catch (ExecutionException e) {
-            logger.log(Level.SEVERE, "Execution error encountered:", e);
-            success = false;
+            throw new QueryException("Execution error encountered:", e);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Execution interrupted error encountered:", e);
-            success = false;
+            throw new QueryException("Execution interrupted error encountered:", e);
         }
-
-        return success;
     }
 
     private static class DBParameter {
